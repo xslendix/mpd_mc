@@ -9,7 +9,8 @@
   ],
   "contributors": [],
   "contact": {
-    "homepage": "https://mpdmc.xslendi.xyz/"
+    "homepage": "https://www.curseforge.com/minecraft/mc-mods/mpd-mc",
+    "sources": "https://github.com/xslendix/mpd_mc"
   },
   "license": "MPL-2.0",
   "icon": "assets/mpdmc/icon.png",
