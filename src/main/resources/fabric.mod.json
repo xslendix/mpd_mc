@@ -1,0 +1,38 @@
+{
+  "schemaVersion": 1,
+  "id": "mpdmc",
+  "version": "${version}",
+  "name": "MPD-MC",
+  "description": "This provides a GUI for MPD.",
+  "authors": [
+    "xSlendiX"
+  ],
+  "contributors": [],
+  "contact": {
+    "homepage": "https://mpdmc.xslendi.xyz/"
+  },
+  "license": "MPL-2.0",
+  "icon": "assets/mpdmc/icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+    ],
+    "modmenu": [
+    	"MPDMC.modmenu.ModMenuImpl"
+    ],
+    "client": [
+      "MPDMC.MpdMC_Main"
+    ],
+    "server": []
+  },
+  "mixins": [
+    "mpdmc.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=0.10.8",
+    "fabric": "*"
+  },
+  "custom": {
+  	"modmenu:clientsideOnly": true
+  }
+}

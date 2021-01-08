@@ -1,0 +1,12 @@
+{
+  "required": true,
+  "package": "MPDMC.mixin",
+  "mixins": [],
+  "client": [
+  	"InGameHudMixin"
+  ],
+  "server": [],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}
