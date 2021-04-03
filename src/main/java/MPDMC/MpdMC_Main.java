@@ -18,15 +18,15 @@ public class MpdMC_Main implements ClientModInitializer {
 
     public static Logger LOGGER = LogManager.getLogger();
     private static KeyBinding keyBinding, keyBinding2;
-    
-    public static boolean toggle = false;
-    
+
+    public static Settings settings = new Settings();
+
     @Override
     public void onInitializeClient() {
         log(Level.INFO, "Initializing");
         keyBinding = new StickyKeyBinding("key.mpdmc.toggle", InputUtil.UNKNOWN_KEY.getCode(), "category.mpdmc.toggle", () -> true);
         keyBinding2 = new KeyBinding("key.mpdmc.press", InputUtil.Type.KEYSYM, InputUtil.UNKNOWN_KEY.getCode(), "category.mpdmc.toggle");
-        
+
         KeyBindingHelper.registerKeyBinding(keyBinding);
         KeyBindingHelper.registerKeyBinding(keyBinding2);
         
@@ -36,8 +36,9 @@ public class MpdMC_Main implements ClientModInitializer {
     }
     
     public void onTick(MinecraftClient mc) {
-    	toggle = keyBinding.isPressed() || keyBinding2.isPressed();
-
+    	Settings.CONFIG_SHOWN = keyBinding.isPressed() || keyBinding2.isPressed();
+    	// TODO: Make this more efficient
+        // settings.save();
     }
 
     public static void log(Level level, String message)

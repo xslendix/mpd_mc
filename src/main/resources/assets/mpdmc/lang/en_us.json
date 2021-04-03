@@ -1,5 +1,23 @@
 {
 	"key.mpdmc.toggle": "MPD (Toggle)",
 	"key.mpdmc.press": "MPD (Hold)",
-	"category.mpdmc.toggle": "MPD-MC"
+	"category.mpdmc.toggle": "MPD-MC",
+	"options.mpd": "MPD Settings",
+	"options.mpd.title": "MPD Settings",
+
+	"options.mpd_top_left": "Top Left",
+	"options.mpd_top": "Top",
+	"options.mpd_top_right": "Top Right",
+	"options.mpd_center_left": "Center Left",
+	"options.mpd_center": "Center",
+	"options.mpd_center_right": "Center Right",
+	"options.mpd_bottom_left": "Bottom Left",
+	"options.mpd_bottom": "Bottom",
+	"options.mpd_bottom_right": "Bottom Right",
+
+	"options.mpd_invalid": "Invalid Setting",
+  	"options.mpd_x_offset": "X Offset",
+	"options.mpd_y_offset": "Y Offset",
+	"options.mpd_padding": "Padding",
+	"options.mpd_position": "Position"
 }

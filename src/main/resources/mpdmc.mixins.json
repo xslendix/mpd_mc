@@ -3,7 +3,8 @@
   "package": "MPDMC.mixin",
   "mixins": [],
   "client": [
-  	"InGameHudMixin"
+  	"InGameHudMixin",
+    "OptionsScreenMixin"
   ],
   "server": [],
   "injectors": {

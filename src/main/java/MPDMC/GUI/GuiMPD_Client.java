@@ -1,22 +1,14 @@
 package MPDMC.GUI;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 import com.mojang.blaze3d.systems.RenderSystem;
-
-import MPDMC.MpdMC_Main;
-import de.dixieflatline.mpcw.client.CommunicationException;
-import de.dixieflatline.mpcw.client.Connection;
-import de.dixieflatline.mpcw.client.EState;
-import de.dixieflatline.mpcw.client.IClient;
-import de.dixieflatline.mpcw.client.IConnection;
-import de.dixieflatline.mpcw.client.IPlayer;
-import de.dixieflatline.mpcw.client.ProtocolException;
-import de.dixieflatline.mpcw.client.Status;
+import de.dixieflatline.mpcw.client.*;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.util.math.MatrixStack;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import static MPDMC.Settings.*;
 
 public class GuiMPD_Client {
 	
@@ -32,7 +24,7 @@ public class GuiMPD_Client {
     private Status status;
     
     private String finalText;
-    
+
     public GuiMPD_Client()
     {
     	minecraft = MinecraftClient.getInstance();
@@ -77,33 +69,67 @@ public class GuiMPD_Client {
     
     public void render(MatrixStack stack, float partialTicks)
     {
-    	if (!MpdMC_Main.toggle || minecraft.options.debugEnabled)
+    	if (!CONFIG_SHOWN || minecraft.options.debugEnabled)
     		return;
     	
 		RenderSystem.pushMatrix();
-		
+
+		float width = MinecraftClient.getInstance().getWindow().getScaledWidth();
+		float height = MinecraftClient.getInstance().getWindow().getScaledHeight();
+		float widthText = fontRenderer.getWidth(finalText);
+		float heightText = fontRenderer.fontHeight;
+
 		if (status != null)
 			if (status.getState() == EState.Play)
 			{
 				// int t = fontRenderer.getWidth(finalText);
-				fontRenderer.drawWithShadow(stack, finalText, 2f, 2f, 0xffffff);
-				
+
+				switch(CONFIG_POSITION) {
+					case TOP_LEFT:
+						fontRenderer.drawWithShadow(stack, finalText, (float)CONFIG_X_OFFSET+(float)CONFIG_PADDING, (float)CONFIG_Y_OFFSET+ (float)CONFIG_PADDING, 0xffffff);
+						break;
+					case TOP:
+						fontRenderer.drawWithShadow(stack, finalText, width/2-widthText/2 + (float)CONFIG_X_OFFSET, (float)CONFIG_Y_OFFSET+ (float)CONFIG_PADDING, 0xffffff);
+						break;
+					case TOP_RIGHT:
+						fontRenderer.drawWithShadow(stack, finalText, width-widthText+(float)CONFIG_X_OFFSET- (float)CONFIG_PADDING, (float)CONFIG_Y_OFFSET+ (float)CONFIG_PADDING, 0xffffff);
+						break;
+					case CENTER_LEFT:
+						fontRenderer.drawWithShadow(stack, finalText, (float)CONFIG_X_OFFSET+ (float)CONFIG_PADDING, height/2-heightText/2+(float)CONFIG_Y_OFFSET, 0xffffff);
+						break;
+					case CENTER:
+						fontRenderer.drawWithShadow(stack, finalText, width/2-widthText/2+(float)CONFIG_X_OFFSET, height/2-heightText/2+(float)CONFIG_Y_OFFSET, 0xffffff);
+						break;
+					case CENTER_RIGHT:
+						fontRenderer.drawWithShadow(stack, finalText, width-widthText+(float)CONFIG_X_OFFSET- (float)CONFIG_PADDING, height/2-heightText/2+(float)CONFIG_Y_OFFSET, 0xffffff);
+						break;
+					case BOTTOM_LEFT:
+						fontRenderer.drawWithShadow(stack, finalText, (float)CONFIG_X_OFFSET+ (float)CONFIG_PADDING, height-heightText-(float)CONFIG_Y_OFFSET- (float)CONFIG_PADDING, 0xffffff);
+						break;
+					case BOTTOM:
+						fontRenderer.drawWithShadow(stack, finalText, width/2-widthText/2+(float)CONFIG_X_OFFSET, height-heightText-(float)CONFIG_Y_OFFSET- (float)CONFIG_PADDING, 0xffffff);
+						break;
+					case BOTTOM_RIGHT:
+						fontRenderer.drawWithShadow(stack, finalText, width-widthText+(float)CONFIG_X_OFFSET- (float)CONFIG_PADDING, height-heightText-(float)CONFIG_Y_OFFSET- (float)CONFIG_PADDING, 0xffffff);
+						break;
+				};
+
 				// TODO: Add progress bar
-				
+
 			}
-		
+
 		RenderSystem.popMatrix();
-    }
-    
-    public void tick()
-    {
-    }
-    
-    private void getStatus()
-    {
+	}
+
+	public void tick()
+	{
+	}
+
+	private void getStatus()
+	{
 		try {
 			status = player.getStatus();
-			
+
 			if (status.getArtist() != null)
 			{
 				finalText = "Now playing: \"" + status.getTitle() + "\" by " + status.getArtist();
