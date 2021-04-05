@@ -15,6 +15,14 @@ minecraft {
 
 repositories {
 	mavenCentral()
+	maven {
+		name = "AperLambda"
+		url = 'https://aperlambda.github.io/maven'
+	}
+	maven { url = "https://jitpack.io" }
+	maven {
+		url "https://masa.dy.fi/maven"
+	}
 }
 
 dependencies {
@@ -28,6 +36,10 @@ dependencies {
 
 	implementation "org.yaml:snakeyaml:1.28"
 	implementation(include("org.yaml:snakeyaml:1.28"))
+
+	//modImplementation "com.github.lambdaurora:spruceui:${project.spruceui_version}"
+	//include "com.github.lambdaurora:spruceui:${project.spruceui_version}"
+	modImplementation "fi.dy.masa.malilib:malilib-fabric-${project.minecraft_version}:${project.malilib_version}"
 }
 
 processResources {

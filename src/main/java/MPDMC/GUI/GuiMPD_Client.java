@@ -1,14 +1,16 @@
 package MPDMC.GUI;
 
+import MPDMC.Config.Config;
 import com.mojang.blaze3d.systems.RenderSystem;
 import de.dixieflatline.mpcw.client.*;
+import fi.dy.masa.malilib.config.IConfigOptionListEntry;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import static MPDMC.Settings.*;
+import static MPDMC.TextPositions.*;
 
 public class GuiMPD_Client {
 	
@@ -18,62 +20,61 @@ public class GuiMPD_Client {
     private final MinecraftClient minecraft;
     private final TextRenderer fontRenderer;
     
-    private IConnection connection;
-    private IClient client;
-    private IPlayer player;
-    private Status status;
+    private static IConnection connection;
+    private static IClient client;
+    private static IPlayer player;
+    private static Status status;
     
-    private String finalText;
+    private static String finalText;
 
-    public GuiMPD_Client()
-    {
-    	minecraft = MinecraftClient.getInstance();
-        fontRenderer = minecraft.textRenderer;
-    	LOGGER = LogManager.getLogger();
-    	
-    	try {
+    public static boolean toggled = false;
+
+    public static void connect(String address) {
+		try {
 			connection = Connection.create("mpd://localhost:6600");
 			if (LOGGER != null) LOGGER.debug("Connecting to MPD.");
 			connection.connect();
-			
+
 			client = connection.getClient();
 			player = client.getPlayer();
 
-    		getStatus();
+			getStatus();
 		} catch (Exception e) {
 			if (LOGGER != null) LOGGER.error("Failed to connect to MPD!");
 			connection = null;
 			e.printStackTrace();
 		}
+	}
+
+	public GuiMPD_Client()
+    {
+    	minecraft = MinecraftClient.getInstance();
+        fontRenderer = minecraft.textRenderer;
+    	LOGGER = LogManager.getLogger();
+
+    	connect("mpd://localhost:6600");
 
         if (LOGGER != null) LOGGER.debug("Created GUI");
         
-        Thread t1 = new Thread(new Runnable()
-        {
-            @Override
-            public void run()
-            {
-            	while (true)
-            	{
-            		getStatus();
-            		try {
-						Thread.sleep(500);
-					} catch (InterruptedException e) {
-						e.printStackTrace();
-					}
-            	}
-            }
-        });  
+        Thread t1 = new Thread(() -> {
+			while (true)
+			{
+				getStatus();
+				try {
+					Thread.sleep(Config.Internal.CONFIG_UPDATE_SPEED.getIntegerValue());
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
+		});
         t1.start();
     }
     
     public void render(MatrixStack stack, float partialTicks)
     {
-    	if (!CONFIG_SHOWN || minecraft.options.debugEnabled)
+    	if (!Config.Enabled.CONFIG_SHOWN_OPTION.getBooleanValue() || minecraft.options.debugEnabled)
     		return;
     	
-		RenderSystem.pushMatrix();
-
 		float width = MinecraftClient.getInstance().getWindow().getScaledWidth();
 		float height = MinecraftClient.getInstance().getWindow().getScaledHeight();
 		float widthText = fontRenderer.getWidth(finalText);
@@ -82,61 +83,55 @@ public class GuiMPD_Client {
 		if (status != null)
 			if (status.getState() == EState.Play)
 			{
-				// int t = fontRenderer.getWidth(finalText);
+				float x_off = (float) Config.Visual.CONFIG_X_OFFSET_OPTION.getDoubleValue();
+				float y_off = (float) Config.Visual.CONFIG_Y_OFFSET_OPTION.getDoubleValue();
+				float padding = (float) Config.Visual.CONFIG_PADDING_OPTION.getDoubleValue();
 
-				switch(CONFIG_POSITION) {
-					case TOP_LEFT:
-						fontRenderer.drawWithShadow(stack, finalText, (float)CONFIG_X_OFFSET+(float)CONFIG_PADDING, (float)CONFIG_Y_OFFSET+ (float)CONFIG_PADDING, 0xffffff);
-						break;
-					case TOP:
-						fontRenderer.drawWithShadow(stack, finalText, width/2-widthText/2 + (float)CONFIG_X_OFFSET, (float)CONFIG_Y_OFFSET+ (float)CONFIG_PADDING, 0xffffff);
-						break;
-					case TOP_RIGHT:
-						fontRenderer.drawWithShadow(stack, finalText, width-widthText+(float)CONFIG_X_OFFSET- (float)CONFIG_PADDING, (float)CONFIG_Y_OFFSET+ (float)CONFIG_PADDING, 0xffffff);
-						break;
-					case CENTER_LEFT:
-						fontRenderer.drawWithShadow(stack, finalText, (float)CONFIG_X_OFFSET+ (float)CONFIG_PADDING, height/2-heightText/2+(float)CONFIG_Y_OFFSET, 0xffffff);
-						break;
-					case CENTER:
-						fontRenderer.drawWithShadow(stack, finalText, width/2-widthText/2+(float)CONFIG_X_OFFSET, height/2-heightText/2+(float)CONFIG_Y_OFFSET, 0xffffff);
-						break;
-					case CENTER_RIGHT:
-						fontRenderer.drawWithShadow(stack, finalText, width-widthText+(float)CONFIG_X_OFFSET- (float)CONFIG_PADDING, height/2-heightText/2+(float)CONFIG_Y_OFFSET, 0xffffff);
-						break;
-					case BOTTOM_LEFT:
-						fontRenderer.drawWithShadow(stack, finalText, (float)CONFIG_X_OFFSET+ (float)CONFIG_PADDING, height-heightText-(float)CONFIG_Y_OFFSET- (float)CONFIG_PADDING, 0xffffff);
-						break;
-					case BOTTOM:
-						fontRenderer.drawWithShadow(stack, finalText, width/2-widthText/2+(float)CONFIG_X_OFFSET, height-heightText-(float)CONFIG_Y_OFFSET- (float)CONFIG_PADDING, 0xffffff);
-						break;
-					case BOTTOM_RIGHT:
-						fontRenderer.drawWithShadow(stack, finalText, width-widthText+(float)CONFIG_X_OFFSET- (float)CONFIG_PADDING, height-heightText-(float)CONFIG_Y_OFFSET- (float)CONFIG_PADDING, 0xffffff);
-						break;
-				};
+				IConfigOptionListEntry optionListValue = Config.Visual.CONFIG_POSITION_OPTION.getOptionListValue();
+				if (TOP_LEFT.equals(optionListValue))
+					fontRenderer.drawWithShadow(stack, finalText, x_off + padding, y_off + padding, 0xffffff);
+				else if (TOP.equals(optionListValue))
+					fontRenderer.drawWithShadow(stack, finalText, width / 2 - widthText / 2 + x_off, y_off + padding, 0xffffff);
+				else if (TOP_RIGHT.equals(optionListValue))
+					fontRenderer.drawWithShadow(stack, finalText, width - widthText + x_off - padding, y_off + padding, 0xffffff);
+				else if (CENTER_LEFT.equals(optionListValue))
+					fontRenderer.drawWithShadow(stack, finalText, x_off + padding, height / 2 - heightText / 2 + y_off, 0xffffff);
+				else if (CENTER.equals(optionListValue))
+					fontRenderer.drawWithShadow(stack, finalText, width / 2 - widthText / 2 + x_off, height / 2 - heightText / 2 + y_off, 0xffffff);
+				else if (CENTER_RIGHT.equals(optionListValue))
+					fontRenderer.drawWithShadow(stack, finalText, width - widthText + x_off - padding, height / 2 - heightText / 2 + y_off, 0xffffff);
+				else if (BOTTOM_LEFT.equals(optionListValue))
+					fontRenderer.drawWithShadow(stack, finalText, x_off + padding, height - heightText - y_off - padding, 0xffffff);
+				else if (BOTTOM.equals(optionListValue))
+					fontRenderer.drawWithShadow(stack, finalText, width / 2 - widthText / 2 + x_off, height - heightText - y_off - padding, 0xffffff);
+				else if (BOTTOM_RIGHT.equals(optionListValue))
+					fontRenderer.drawWithShadow(stack, finalText, width - widthText + x_off - padding, height - heightText - y_off - padding, 0xffffff);
 
 				// TODO: Add progress bar
 
 			}
-
-		RenderSystem.popMatrix();
 	}
 
 	public void tick()
 	{
 	}
 
-	private void getStatus()
+	public static String getFormatted(String input) {
+    	return input.replace("%artist%", status.getArtist()).replace("%title%", status.getTitle());
+	}
+
+	private static void getStatus()
 	{
 		try {
 			status = player.getStatus();
 
 			if (status.getArtist() != null)
 			{
-				finalText = "Now playing: \"" + status.getTitle() + "\" by " + status.getArtist();
+				finalText = getFormatted(Config.Format.CONFIG_FORMAT_ARTIST.getStringValue());
 			}
 			else if (status.getTitle() != null)
 			{
-				finalText = "Now playing: \"" + status.getTitle() + "\"";
+				finalText = getFormatted(Config.Format.CONFIG_FORMAT_NO_ARTIST.getStringValue());
 			}
 			else
 			{

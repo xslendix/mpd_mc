@@ -1,15 +1,12 @@
 package MPDMC.mixin;
 
-import MPDMC.GUI.Screens.MPDOptionsScreen;
-import net.minecraft.client.MinecraftClient;
+import MPDMC.GUI.GuiConfigs;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.screen.options.AccessibilityOptionsScreen;
 import net.minecraft.client.gui.screen.options.OptionsScreen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.options.GameOptions;
 import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
-import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -27,8 +24,11 @@ public class OptionsScreenMixin extends Screen {
 
     @Inject(at = @At("TAIL"), method = "init", require = 1)
     protected void init(CallbackInfo ci) {
-        this.addButton(new ButtonWidget(this.width / 2 - 155, this.height / 6 + 144 - 6, 150, 20, new TranslatableText("options.mpd.title"), (button) -> {
-            this.client.openScreen(new MPDOptionsScreen(this, this.settings));
+        this.addButton(new ButtonWidget(this.width / 2 - 155, this.height / 6 + 144 - 6, 150, 20, new TranslatableText("mpd.title"), (button) -> {
+            GuiConfigs gui = new GuiConfigs();
+            gui.setParent(this);
+            assert this.client != null;
+            this.client.openScreen(gui);
         }));
     }
 
