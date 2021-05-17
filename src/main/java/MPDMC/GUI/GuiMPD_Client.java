@@ -20,9 +20,9 @@ public class GuiMPD_Client {
     private final MinecraftClient minecraft;
     private final TextRenderer fontRenderer;
     
-    private static IConnection connection;
-    private static IClient client;
-    private static IPlayer player;
+    public static IConnection connection;
+    public static IClient client;
+    public static IPlayer player;
     private static Status status;
     
     private static String finalText;
@@ -31,6 +31,8 @@ public class GuiMPD_Client {
 
     public static void connect(String address) {
 		try {
+			if (connection != null)
+				connection.disconnect();
 			connection = Connection.create("mpd://localhost:6600");
 			if (LOGGER != null) LOGGER.debug("Connecting to MPD.");
 			connection.connect();
