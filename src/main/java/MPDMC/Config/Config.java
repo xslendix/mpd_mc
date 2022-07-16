@@ -58,10 +58,12 @@ public class Config implements IConfigHandler {
     public static class Format {
         public static ConfigString CONFIG_FORMAT_ARTIST = new ConfigString("formatWithArtist", "Now playing: \"%title%\" by %artist%", "This format is what will appear if the author was found.");
         public static ConfigString CONFIG_FORMAT_NO_ARTIST = new ConfigString("formatWithoutArtist", "Now playing: \"%title%\"", "This format is what will appear if no author was found. %title% in this case may be the filename or song title.");
+        public static ConfigInteger CONFIG_CUT_STRING = new ConfigInteger("formatStringCutLen", 20, 0, 999, "The maximum length in characters of either the artist or song title. If length too long, it's cut with an ellipsis.");
 
         public static final ImmutableList<IConfigBase> SETTINGS = ImmutableList.of(
                 CONFIG_FORMAT_ARTIST,
-                CONFIG_FORMAT_NO_ARTIST
+                CONFIG_FORMAT_NO_ARTIST,
+                CONFIG_CUT_STRING
         );
     }
 

@@ -48,6 +48,34 @@ public class GuiMPD_Client {
 		}
 	}
 
+	// https://stackoverflow.com/a/3657496
+	public static String ellipsize(String text, int max) {
+		if (text.length() <= max)
+			return text;
+
+		// Start by chopping off at the word before max
+		// This is an over-approximation due to thin-characters...
+		int end = text.lastIndexOf(' ', max - 3);
+
+		// Just one long word. Chop it off.
+		if (end == -1)
+			return text.substring(0, max-3) + "...";
+
+		// Step forward as long as textWidth allows.
+		int newEnd = end;
+		do {
+			end = newEnd;
+			newEnd = text.indexOf(' ', end + 1);
+
+			// No more spaces.
+			if (newEnd == -1)
+				newEnd = text.length();
+
+		} while ((text.substring(0, newEnd) + "...").length() < max);
+
+		return text.substring(0, end) + "...";
+	}
+
 	public GuiMPD_Client()
     {
     	minecraft = MinecraftClient.getInstance();
@@ -119,7 +147,9 @@ public class GuiMPD_Client {
 	}
 
 	public static String getFormatted(String input) {
-    	return input.replace("%artist%", status.getArtist()).replace("%title%", status.getTitle());
+		String artist = ellipsize(status.getArtist(), Config.Format.CONFIG_CUT_STRING.getIntegerValue());
+		String title = ellipsize(status.getTitle(), Config.Format.CONFIG_CUT_STRING.getIntegerValue());
+    	return input.replace("%artist%", artist).replace("%title%", title);
 	}
 
 	private static void getStatus()
